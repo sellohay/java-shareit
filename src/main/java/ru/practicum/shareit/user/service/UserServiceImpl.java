@@ -7,6 +7,7 @@ import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.dao.UserStorage;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -45,7 +46,7 @@ public class UserServiceImpl implements UserService {
             throw new NotFoundException("Пользователь с id=" + id + " не найден");
         }
         if (user.getEmail() != null) {
-            if (!oldUser.getEmail().equals(user.getEmail()) && userStorage.checkEmailExists(user.getEmail())) {
+            if (!Objects.equals(oldUser.getEmail(), user.getEmail()) && userStorage.checkEmailExists(user.getEmail())) {
                 throw new SameEmailException("Пользователь с почтой \"" + user.getEmail() + "\" уже есть");
             }
         }

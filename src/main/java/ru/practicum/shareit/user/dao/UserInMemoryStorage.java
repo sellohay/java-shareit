@@ -54,7 +54,9 @@ public class UserInMemoryStorage implements UserStorage {
 
     @Override
     public boolean checkEmailExists(String email) {
-        if (email == null) return false;
+        if (email == null) {
+            return false;
+        }
         return users.values().stream()
                 .anyMatch(user -> user.getEmail().equals(email));
     }

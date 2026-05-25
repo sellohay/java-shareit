@@ -44,8 +44,10 @@ public class ItemInMemoryStorage implements ItemStorage {
     public List<Item> searchItems(String text) {
         return items.values()
                 .stream()
-                .filter(item -> item.getName().toLowerCase().contains(text.toLowerCase())
-                        || item.getDescription().toLowerCase().contains(text.toLowerCase()))
+                .filter(item -> ((item.getName() != null)
+                        && (item.getName().toLowerCase().contains(text.toLowerCase())))
+                        || ((item.getDescription() != null)
+                        && item.getDescription().toLowerCase().contains(text.toLowerCase())))
                 .filter(item -> item.getAvailable().equals(true))
                 .toList();
     }
