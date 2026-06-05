@@ -26,7 +26,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> getItems(Long id) {
         validateUser(id);
-        return itemStorage.getItemsForUser(id)
+        return itemStorage.findByUserId(id)
                 .stream()
                 .map(ItemMapper::mapToItemDto)
                 .toList();
@@ -36,8 +36,10 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto createItem(long userId, ItemDto itemDto) {
         validateUser(userId);
         validateItemDto(itemDto);
-        Item createdItem = itemStorage.createItem(userId, ItemMapper.mapToItem(itemDto));
-        return ItemMapper.mapToItemDto(createdItem);
+        Item item = ItemMapper.mapToItem(itemDto);
+        item.setUser(userService.getUserById(userId));
+        itemStorage.save(item);
+        return ItemMapper.mapToItemDto(item);
     }
 
     @Override
@@ -45,8 +47,19 @@ public class ItemServiceImpl implements ItemService {
         validateUser(userId);
         checkItemExists(itemId);
         checkItemOwner(itemId, userId);
-        Item editedItem = itemStorage.editItem(itemId, ItemMapper.mapToItem(itemDto));
-        return ItemMapper.mapToItemDto(editedItem);
+        Item item = ItemMapper.mapToItem(itemDto);
+        Item oldItem = itemStorage.findById(itemId).get();
+        if (!item.getName().isBlank()) {
+            oldItem.setName(item.getName());
+        }
+        if (!item.getDescription().isBlank()) {
+            oldItem.setDescription(item.getDescription());
+        }
+        if (item.getAvailable() != null) {
+            oldItem.setAvailable(item.getAvailable());
+        }
+        itemStorage.save(oldItem);
+        return ItemMapper.mapToItemDto(oldItem);
     }
 
     @Override
@@ -54,7 +67,7 @@ public class ItemServiceImpl implements ItemService {
         if (!checkItemExists(itemId)) {
             throw new NotFoundException("Вещь с id=" + itemId + " не найдена");
         }
-        return ItemMapper.mapToItemDto(itemStorage.getItemById(itemId));
+        return ItemMapper.mapToItemDto(itemStorage.findById(itemId).get());
     }
 
     @Override
@@ -62,7 +75,7 @@ public class ItemServiceImpl implements ItemService {
         if (text.isEmpty()) {
             return new ArrayList<>();
         }
-        List<Item> itemsFound = itemStorage.searchItems(text);
+        List<Item> itemsFound = itemStorage.search(text);
         return itemsFound.stream()
                 .map(ItemMapper::mapToItemDto)
                 .toList();
@@ -77,12 +90,12 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public boolean checkItemExists(Long itemId) {
-        return itemStorage.checkItemExists(itemId);
+        return itemStorage.existsById(itemId);
     }
 
     @Override
     public void checkItemOwner(Long itemId, Long userId) {
-        if (!itemStorage.isOwner(itemId, userId)) {
+        if (!itemStorage.existsByIdAndUserId(itemId, userId)) {
             throw new ValidationException("Пользователь id=" + userId + " не является владельцем вещи id=" + itemId);
         }
     }

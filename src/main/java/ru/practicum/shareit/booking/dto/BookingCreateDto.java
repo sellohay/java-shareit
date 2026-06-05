@@ -3,16 +3,13 @@ package ru.practicum.shareit.booking.dto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import ru.practicum.shareit.booking.enums.BookingStatus;
 
 import java.time.LocalDate;
 
 @Getter @Setter @ToString
-public class BookingDto {
-    private Long id;
+public class BookingCreateDto {
     private Long itemId;
     private LocalDate startDate;
     private LocalDate endDate;
-    private BookingStatus status;
     private Long userId;
 }

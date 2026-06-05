@@ -1,15 +1,23 @@
 package ru.practicum.shareit.user;
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
+@Entity
+@Table(name="users")
+@Setter @Getter @ToString
 public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotBlank
+
     private String name;
-    @NotBlank
+
     @Email
+    @Column(name="email", unique = true)
     private String email;
 }

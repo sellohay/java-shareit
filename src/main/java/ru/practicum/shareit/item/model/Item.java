@@ -1,17 +1,24 @@
 package ru.practicum.shareit.item.model;
 
-import lombok.Data;
-import ru.practicum.shareit.comment.model.Comment;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import ru.practicum.shareit.user.User;
 
-import java.util.List;
-
-@Data
+@Entity
+@Table(name="items")
+@Setter @Getter @ToString
 public class Item {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
     private String description;
     private Boolean available;
-    private Long userId;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    private List<Comment> comments;
+    //private List<Comment> comments;
 }
