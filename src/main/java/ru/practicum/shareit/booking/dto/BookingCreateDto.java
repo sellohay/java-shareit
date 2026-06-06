@@ -1,15 +1,23 @@
 package ru.practicum.shareit.booking.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-@Getter @Setter @ToString
+@Getter
+@Setter
+@ToString
 public class BookingCreateDto {
+    @NotNull
     private Long itemId;
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private Long userId;
+    @NotNull
+    @JsonProperty("start")
+    private LocalDateTime startDate;
+    @NotNull
+    @JsonProperty("end")
+    private LocalDateTime endDate;
 }

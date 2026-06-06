@@ -6,19 +6,26 @@ import lombok.Setter;
 import lombok.ToString;
 import ru.practicum.shareit.user.User;
 
+import java.time.LocalDateTime;
+
 @Entity
-@Table(name = "items")
-@Setter
+@Table(name = "comments")
 @Getter
+@Setter
 @ToString
-public class Item {
+public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private String description;
-    private Boolean available;
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_id")
+    private Item item;
+    private String text;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
-    private User user;
+    private User author;
+
+    private LocalDateTime created;
 }

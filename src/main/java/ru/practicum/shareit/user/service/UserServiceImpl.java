@@ -70,8 +70,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean userExists(Long userId) {
-        return userStorage.existsById(userId);
+    public void checkUserExists(Long userId) {
+        if (!userStorage.existsById(userId)) {
+            throw new NotFoundException("Пользователь с id=" + userId + " не найден");
+        }
     }
 
 }

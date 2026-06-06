@@ -2,8 +2,13 @@ package ru.practicum.shareit.item.mapper;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemDetailedDto;
 import ru.practicum.shareit.item.model.Item;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemMapper {
@@ -24,5 +29,19 @@ public class ItemMapper {
         item.setDescription(itemDto.getDescription() != null ? itemDto.getDescription() : "");
         item.setAvailable(itemDto.getAvailable());
         return item;
+    }
+
+    public static ItemDetailedDto mapToItemWithDatesDto(Item item,
+                                                        LocalDateTime lastBookingDate, LocalDateTime nearestBookingDate,
+                                                        List<CommentDto> comments) {
+        ItemDetailedDto dto = new ItemDetailedDto();
+        dto.setId(item.getId());
+        dto.setName(item.getName());
+        dto.setDescription(item.getDescription());
+        dto.setAvailable(item.getAvailable());
+        dto.setLastBookingDate(lastBookingDate);
+        dto.setNearestBookingDate(nearestBookingDate);
+        dto.setComments(comments);
+        return dto;
     }
 }
