@@ -60,26 +60,7 @@ public class ItemServiceImpl implements ItemService {
                 .stream().collect(Collectors.groupingBy(c -> c.getItem().getId()));
 
         return items.stream()
-                .map(item -> {
-                    List<Booking> itemBookings = bookingsByItem.getOrDefault(item.getId(), new ArrayList<>());
-
-                    LocalDateTime lastBookingDate = itemBookings.stream()
-                            .map(Booking::getStartDate)
-                            .filter(date -> date.isBefore(now))
-                            .max(LocalDateTime::compareTo)
-                            .orElse(null);
-
-                    LocalDateTime nearestBookingDate = itemBookings.stream()
-                            .map(Booking::getStartDate)
-                            .filter(date -> date.isAfter(now))
-                            .min(LocalDateTime::compareTo)
-                            .orElse(null);
-
-                    List<CommentDto> comments = commentsByItem.getOrDefault(item.getId(), new ArrayList<>())
-                            .stream().map(CommentMapper::mapToCommentDto).toList();
-
-                    return ItemMapper.mapToItemWithDatesDto(item, lastBookingDate, nearestBookingDate, comments);
-                })
+                .map(item -> processItem(item, bookingsByItem, commentsByItem, now))
                 .toList();
     }
 
@@ -212,5 +193,27 @@ public class ItemServiceImpl implements ItemService {
         if (itemDto.getDescription() == null || itemDto.getDescription().isEmpty()) {
             throw new ValidationException("Отсутствует описание вещи");
         }
+    }
+
+    private ItemDetailedDto processItem(Item item, Map<Long, List<Booking>> bookingsByItem,
+                                        Map<Long, List<Comment>> commentsByItem, LocalDateTime now) {
+        List<Booking> itemBookings = bookingsByItem.getOrDefault(item.getId(), new ArrayList<>());
+
+        LocalDateTime lastBookingDate = itemBookings.stream()
+                .map(Booking::getStartDate)
+                .filter(date -> date.isBefore(now))
+                .max(LocalDateTime::compareTo)
+                .orElse(null);
+
+        LocalDateTime nearestBookingDate = itemBookings.stream()
+                .map(Booking::getStartDate)
+                .filter(date -> date.isAfter(now))
+                .min(LocalDateTime::compareTo)
+                .orElse(null);
+
+        List<CommentDto> comments = commentsByItem.getOrDefault(item.getId(), new ArrayList<>())
+                .stream().map(CommentMapper::mapToCommentDto).toList();
+
+        return ItemMapper.mapToItemWithDatesDto(item, lastBookingDate, nearestBookingDate, comments);
     }
 }
