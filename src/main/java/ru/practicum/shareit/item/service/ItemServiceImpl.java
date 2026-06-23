@@ -15,12 +15,15 @@ import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.dao.ItemRequestStorage;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,12 +32,15 @@ public class ItemServiceImpl implements ItemService {
     private final ItemStorage itemStorage;
     private final UserService userService;
     private final BookingStorage bookingStorage;
+    private final ItemRequestStorage itemRequestStorage;
     private final CommentStorage commentStorage;
 
-    public ItemServiceImpl(ItemStorage itemStorage, UserService userService, BookingStorage bookingStorage, CommentStorage commentStorage) {
+    public ItemServiceImpl(ItemStorage itemStorage, UserService userService, BookingStorage bookingStorage,
+                           ItemRequestStorage itemRequestStorage, CommentStorage commentStorage) {
         this.itemStorage = itemStorage;
         this.userService = userService;
         this.bookingStorage = bookingStorage;
+        this.itemRequestStorage = itemRequestStorage;
         this.commentStorage = commentStorage;
     }
 
@@ -67,9 +73,17 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemDto createItem(long userId, ItemDto itemDto) {
         userService.checkUserExists(userId);
+        if (itemDto.getRequestId() != null && !itemRequestStorage.existsById(itemDto.getRequestId())) {
+            throw new NotFoundException("Неверно указан запрос (id=" + itemDto.getRequestId() + ")");
+        }
         validateItemDto(itemDto);
         Item item = ItemMapper.mapToItem(itemDto);
         item.setUser(userService.getUserById(userId));
+        item.setRequest(null);
+        if (itemDto.getRequestId() != null) {
+            Optional<ItemRequest> reqOpt = itemRequestStorage.findById(itemDto.getRequestId());
+            item.setRequest(reqOpt.orElse(null));
+        }
         itemStorage.save(item);
         return ItemMapper.mapToItemDto(item);
     }
@@ -178,6 +192,22 @@ public class ItemServiceImpl implements ItemService {
         comment.setAuthor(userService.getUserById(userId));
         comment = commentStorage.save(comment);
         return CommentMapper.mapToCommentDto(comment);
+    }
+
+    @Override
+    public List<ItemDto> getItemsByRequests(List<Long> requestIds) {
+        return itemStorage.findAllByRequestIdIn(requestIds)
+                .stream()
+                .map(ItemMapper::mapToItemDto)
+                .toList();
+    }
+
+    @Override
+    public List<ItemDto> getItemsByRequest(Long requestId) {
+        return itemStorage.findAllByRequestId(requestId)
+                .stream()
+                .map(ItemMapper::mapToItemDto)
+                .toList();
     }
 
     public Item getItemEntityById(Long itemId) {

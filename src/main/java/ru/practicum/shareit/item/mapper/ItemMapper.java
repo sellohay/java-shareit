@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDetailedDto;
+import ru.practicum.shareit.item.dto.ItemResponseDto;
 import ru.practicum.shareit.item.model.Item;
 
 import java.time.LocalDateTime;
@@ -19,6 +20,10 @@ public class ItemMapper {
         itemDto.setName(item.getName());
         itemDto.setDescription(item.getDescription());
         itemDto.setAvailable(item.getAvailable());
+        if (item.getRequest() != null) {
+            itemDto.setRequestId(item.getRequest().getId());
+        }
+        itemDto.setOwnerId(item.getUser().getId());
         return itemDto;
     }
 
@@ -43,5 +48,13 @@ public class ItemMapper {
         dto.setNearestBookingDate(nearestBookingDate);
         dto.setComments(comments);
         return dto;
+    }
+
+    public static ItemResponseDto mapToItemResponseDto(ItemDto item) {
+        ItemResponseDto itemResponseDto = new ItemResponseDto();
+        itemResponseDto.setItemId(item.getId());
+        itemResponseDto.setName(item.getName());
+        itemResponseDto.setOwnerId(item.getOwnerId());
+        return itemResponseDto;
     }
 }

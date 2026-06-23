@@ -29,4 +29,8 @@ public interface ItemService {
     void checkItemAvailable(Long itemId);
 
     CommentDto createComment(Long userId, Long itemId, CommentDto dto);
+
+    List<ItemDto> getItemsByRequests(List<Long> requestIds);
+
+    List<ItemDto> getItemsByRequest(Long requestId);
 }
