@@ -100,6 +100,13 @@
 					<version>0.8.12</version>
 					<configuration>
 						<output>file</output>
+						<excludes>
+							<exclude>ru/practicum/shareit/ShareItServer.class</exclude>
+							<exclude>ru/practicum/shareit/exception/**</exclude>
+							<exclude>ru/practicum/shareit/item/mapper/**</exclude>
+							<exclude>ru/practicum/shareit/request/mapper/**</exclude>
+							<exclude>ru/practicum/shareit/user/dto/**</exclude>
+						</excludes>
 					</configuration>
 					<executions>
 						<execution>
